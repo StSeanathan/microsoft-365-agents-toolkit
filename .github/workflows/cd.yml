@@ -73,19 +73,14 @@ jobs:
           npx lerna version prerelease --preid=alpha.$(git rev-parse --short HEAD) --exact --no-push --allow-branch ${GITHUB_REF#refs/*/} --yes
 
       - name: release beta packages to npmjs.org
-        if: ${{ github.ref != 'refs/heads/dev' && github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'beta' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'beta' }}
         run: |
           npx lerna version prerelease --preid=beta.$(date "+%Y%m%d%H") --exact --no-push --allow-branch ${GITHUB_REF#refs/*/} --yes
 
       - name: version rc npm packages to npmjs.org
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'rc' && !startsWith(github.ref, 'refs/heads/hotfix/') && github.event.inputs.skip-version-rc == 'no'}}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'rc' && github.event.inputs.skip-version-rc == 'no'}}
         run: |
-          npx lerna version prerelease --conventional-prerelease --preid=rc --no-changelog --yes
-
-      - name: version rc npm packages to npmjs.org on hotfix
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.preid == 'rc' && startsWith(github.ref, 'refs/heads/hotfix/') && github.event.inputs.skip-version-rc == 'no'}}
-        run: |
-          npx lerna version prerelease --conventional-prerelease --preid=rc-hotfix --no-changelog --allow-branch ${GITHUB_REF#refs/*/} --yes
+          npx lerna version prerelease --conventional-prerelease --preid=rc --no-changelog --allow-branch ${GITHUB_REF#refs/*/} --yes
 
       - name: version stable npm packages to npmjs.org
         if: ${{ github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/dev' && github.event.inputs.preid == 'stable' }}
