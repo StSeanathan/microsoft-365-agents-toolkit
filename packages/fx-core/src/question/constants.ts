@@ -784,6 +784,13 @@ export class ApiAuthOptions {
   static apiKey(): OptionItem {
     return {
       id: "api-key",
+      label: "API Key",
+    };
+  }
+
+  static bearerToken(): OptionItem {
+    return {
+      id: "bearer-token",
       label: "API Key (Bearer Token Auth)",
     };
   }
@@ -806,6 +813,7 @@ export class ApiAuthOptions {
     return [
       ApiAuthOptions.none(),
       ApiAuthOptions.apiKey(),
+      ApiAuthOptions.bearerToken(),
       ApiAuthOptions.microsoftEntra(),
       ApiAuthOptions.oauth(),
     ];
