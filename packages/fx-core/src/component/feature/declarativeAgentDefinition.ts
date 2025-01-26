@@ -9,7 +9,7 @@ export interface DeclarativeAgentBotDefinition {
 }
 
 export interface DeclarativeAgentDefinition {
-  id?: string;
+  id: string;
   name: string;
   teams_app_id: string;
 }

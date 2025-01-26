@@ -432,6 +432,26 @@ export class ManifestUtils {
     }
     return ok(undefined);
   }
+
+  /**
+   * Replace the copilotAgents.declarativeAgents.id with the given id
+   */
+  async replaceDeclarativeAgentId(
+    manifestPath: string,
+    id: string
+  ): Promise<Result<undefined, FxError>> {
+    const appManifestRes = await this._readAppManifest(manifestPath);
+    if (appManifestRes.isErr()) return err(appManifestRes.error);
+    const appManifest = appManifestRes.value;
+    if (appManifest.copilotAgents?.declarativeAgents?.[0]) {
+      appManifest.copilotAgents.declarativeAgents[0].id = id;
+    }
+
+    const content = JSON.stringify(appManifest, undefined, 4);
+    const contentV2 = convertManifestTemplateToV2(content);
+    await fs.writeFile(manifestPath, contentV2);
+    return ok(undefined);
+  }
 }
 
 export const manifestUtils = new ManifestUtils();

@@ -177,6 +177,7 @@ import { addExistingPlugin } from "../component/generator/copilotExtension/helpe
 import { DeclarativeAgentBotContext } from "../component/feature/declarativeAgentBotContext";
 import { create } from "../component/feature/createDeclarativeAgentBot";
 import { featureFlagManager, FeatureFlags } from "../common/featureFlags";
+import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 
 export class FxCore {
   constructor(tools: Tools) {
@@ -2289,11 +2290,9 @@ export class FxCore {
     if (teamsManifestRes.isErr()) {
       return err(teamsManifestRes.error);
     }
-    const declarativeAgentManifesRes = await copilotGptManifestUtils.getManifestPath(
-      teamsManifestPath
-    );
-    if (declarativeAgentManifesRes.isErr()) {
-      return err(declarativeAgentManifesRes.error);
+    const agentManifestPath = await copilotGptManifestUtils.getManifestPath(teamsManifestPath);
+    if (agentManifestPath.isErr()) {
+      return err(agentManifestPath.error);
     }
 
     // Check if there is M365_APP_ID in .env file
@@ -2322,18 +2321,13 @@ export class FxCore {
       return err(new UserCancelError());
     }
 
-    const agentIdRes = await copilotGptManifestUtils.getAgentId(teamsManifestPath);
-    if (agentIdRes.isErr()) {
-      return err(agentIdRes.error);
-    }
-
     // Create a context for creating declarative agent bot
     const botContext = await DeclarativeAgentBotContext.create(
       inputs.platform,
       inputs.env,
       inputs.projectPath,
-      declarativeAgentManifesRes.value,
-      agentIdRes.value,
+      teamsManifestPath,
+      agentManifestPath.value,
       inputs[QuestionNames.MultiTenant]
     );
 

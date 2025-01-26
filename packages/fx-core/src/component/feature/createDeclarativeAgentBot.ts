@@ -3,6 +3,7 @@
 
 import * as fs from "fs-extra";
 import * as path from "path";
+import { v4 as uuidv4, validate as uuidValidate } from "uuid";
 
 import { AppPackageFolderName, IBot, InputsWithProjectPath } from "@microsoft/teamsfx-api";
 
@@ -30,7 +31,7 @@ export async function create(context: DeclarativeAgentBotContext): Promise<void>
 
 async function wrapExecution(context: DeclarativeAgentBotContext): Promise<void> {
   try {
-    prepare(context);
+    await prepare(context);
     await updateLaunchJson(context);
     await updateManifest(context);
     await provisionBot(context);
@@ -41,7 +42,7 @@ async function wrapExecution(context: DeclarativeAgentBotContext): Promise<void>
   }
 }
 
-function prepare(context: DeclarativeAgentBotContext): void {
+async function prepare(context: DeclarativeAgentBotContext): Promise<void> {
   const state = loadStateFromEnv(new Map(Object.entries(defaultOutputNames)));
   if (state.agentId) {
     context.isProvisioned = true;
@@ -49,8 +50,26 @@ function prepare(context: DeclarativeAgentBotContext): void {
   if (state.botId) {
     context.teamsBotId = state.botId;
   }
+
+  const agentIdRes = await copilotGptManifestUtils.getAgentId(context.teamsManifestPath);
+  if (agentIdRes.isErr()) {
+    throw agentIdRes.error;
+  }
+
+  let agentId = agentIdRes.value;
+  // Check if the agentIdRes.value is a GUID, if not, generate a new one
+  if (!uuidValidate(agentId)) {
+    agentId = uuidv4();
+  }
+
+  context.agentId = agentId;
 }
 
+/**
+ * Update launch.json
+ * @param context
+ * @returns
+ */
 async function updateLaunchJson(context: DeclarativeAgentBotContext): Promise<void> {
   if (context.isProvisioned) {
     TOOLS.logProvider.info("Bot is already provisioned, skip updating launch.json");
@@ -95,13 +114,18 @@ async function updateLaunchJson(context: DeclarativeAgentBotContext): Promise<vo
   }
 }
 
+/**
+ * Update Teams manifest
+ * @param context
+ * @returns
+ */
 async function updateManifest(context: DeclarativeAgentBotContext): Promise<void> {
   if (context.isProvisioned) {
     TOOLS.logProvider.info("Bot is already provisioned, skip updating manifest.");
     return;
   }
   const manifestFile = path.join(AppPackageFolderName, MetadataV3.teamsManifestFileName);
-  const manifestPath = path.join(context.projectPath, manifestFile);
+  const manifestPath = context.teamsManifestPath;
   if (await fs.pathExists(manifestPath)) {
     await context.backup(manifestFile);
     const botCapability: IBot = {
@@ -116,9 +140,19 @@ async function updateManifest(context: DeclarativeAgentBotContext): Promise<void
       projectPath: context.projectPath,
     };
     await manifestUtils.addCapabilities(inputs, [{ name: "Bot", snippet: botCapability }]);
+
+    if (!context.agentId) {
+      throw new Error("Agent ID is not defined");
+    }
+    await manifestUtils.replaceDeclarativeAgentId(manifestPath, context.agentId);
   }
 }
 
+/**
+ * Provision bot
+ * @param context
+ * @returns
+ */
 async function provisionBot(context: DeclarativeAgentBotContext): Promise<void> {
   if (context.isProvisioned) {
     TOOLS.logProvider.info("Bot is already provisioned, skip provisioning.");
@@ -136,6 +170,10 @@ async function provisionBot(context: DeclarativeAgentBotContext): Promise<void> 
     throw new Error("M365 app id or tenant id is not found in .env file.");
   }
 
+  if (!context.agentId) {
+    throw new Error("Agent ID is not defined");
+  }
+
   // construct payload for bot provisioning
   const payload: DeclarativeAgentBotDefinition = {
     GptDefinition: {
@@ -145,7 +183,7 @@ async function provisionBot(context: DeclarativeAgentBotContext): Promise<void> 
     },
     PersistenceMode: 0,
     EnabledChannels: ["msteams"],
-    IsMultiTenant: context.multiTenant,
+    IsMultiTenant: Boolean(context.multiTenant),
   };
 
   // provision bot
@@ -156,11 +194,15 @@ async function provisionBot(context: DeclarativeAgentBotContext): Promise<void> 
   if (tokenResult.isErr()) {
     throw tokenResult.error;
   }
-
   await copilotStudioClient.createBot(tokenResult.value, payload, state.tenantId);
   await context.writeEnv("AGENT_ID", context.agentId);
 }
 
+/**
+ * Get Teams Bot id from copilot studio
+ * @param context
+ * @returns
+ */
 async function getBotId(context: DeclarativeAgentBotContext): Promise<void> {
   if (context.isProvisioned && context.teamsBotId) {
     TOOLS.logProvider.info("Bot is already provisioned, skip getting bot id.");
@@ -188,6 +230,11 @@ async function getBotId(context: DeclarativeAgentBotContext): Promise<void> {
   }
 }
 
+/**
+ * Rollback execution if failed
+ * @param context
+ * @returns
+ */
 async function rollbackExecution(context: DeclarativeAgentBotContext): Promise<void> {
   await context.cleanModifiedPaths();
   await context.restoreBackup();
