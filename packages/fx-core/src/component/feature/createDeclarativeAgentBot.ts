@@ -128,18 +128,6 @@ async function updateManifest(context: DeclarativeAgentBotContext): Promise<void
   const manifestPath = context.teamsManifestPath;
   if (await fs.pathExists(manifestPath)) {
     await context.backup(manifestFile);
-    const botCapability: IBot = {
-      botId: "${{BOT_ID}}",
-      scopes: ["personal", "team", "groupChat"],
-      supportsFiles: false,
-      isNotificationOnly: false,
-    };
-    const inputs: InputsWithProjectPath = {
-      platform: context.platform,
-      addManifestPath: manifestPath,
-      projectPath: context.projectPath,
-    };
-    await manifestUtils.addCapabilities(inputs, [{ name: "Bot", snippet: botCapability }]);
 
     if (!context.agentId) {
       throw new Error("Agent ID is not defined");
