@@ -61,7 +61,7 @@ export class DeclarativeAgentBotContext {
   }
 
   async backup(_path: string): Promise<boolean> {
-    const srcPath = path.join(this.projectPath, _path);
+    const srcPath = path.isAbsolute(_path) ? _path : path.join(this.projectPath, _path);
     if (await fs.pathExists(srcPath)) {
       await fs.copy(srcPath, path.join(this.projectPath, backupFolder, _path));
       return true;
