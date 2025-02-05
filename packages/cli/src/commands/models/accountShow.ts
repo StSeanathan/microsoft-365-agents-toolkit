@@ -32,7 +32,7 @@ class AccountUtils {
   async outputM365Info(commandType: "login" | "show", tid?: string): Promise<boolean> {
     const tokenJsonRes = await M365TokenProvider.getJsonObject(
       {
-        scopes: [...AppStudioScopes, ...CopilotStudioScopes],
+        scopes: AppStudioScopes,
       },
       tid
     );
