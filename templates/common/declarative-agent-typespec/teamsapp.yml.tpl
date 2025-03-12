@@ -25,7 +25,7 @@ provision:
   - uses: typeSpec/compile
     with:
       path: ./main.tsp
-      manifestFilePath: ./appPackage/manifest.json
+      manifestPath: ./appPackage/manifest.json
 
   # Build Teams app package with latest env value
   - uses: teamsApp/zipAppPackage
