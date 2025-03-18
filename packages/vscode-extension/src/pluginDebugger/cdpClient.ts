@@ -105,14 +105,19 @@ export class CDPClient {
 
   async connectToTargetIframe(client: CDP.Client): Promise<boolean> {
     const targets = await client.Target.getTargets();
+    logger.debug(
+      `CDPClient.connectToTargetIframe() - input iframe targets: ${JSON.stringify(
+        targets.targetInfos
+      )}`
+    );
     const iframeTargets = targets.targetInfos.filter(
       ({ type, url }) =>
         type === "iframe" && url.includes("outlook.office.com/hosted/semanticoverview/Users")
     );
     logger.debug(
-      `CDPClient.connectToTargetIframe() - filter out the iframe targets: ${iframeTargets
-        .map((i) => i.url)
-        .join(", ")}`
+      `CDPClient.connectToTargetIframe() - filtered iframe targets: ${JSON.stringify(
+        iframeTargets
+      )}`
     );
     for (const iframeTarget of iframeTargets) {
       const iframeClient = await this.connectWithBackoff(this.port, iframeTarget.targetId);
