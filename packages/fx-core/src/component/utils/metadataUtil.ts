@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { FxError, Result, TeamsAppManifest, devPreview } from "@microsoft/teamsfx-api";
-import { TelemetryEvent, TelemetryProperty } from "../../common/telemetry";
+import { FxError, MicrosoftTeamsManifest, Result } from "@microsoft/teamsfx-api";
+import { createHash } from "crypto";
+import * as path from "path";
 import { TOOLS } from "../../common/globalVars";
+import { TelemetryEvent, TelemetryProperty } from "../../common/telemetry";
 import { LifecycleNames, ProjectModel } from "../configManager/interface";
 import { yamlParser } from "../configManager/parser";
-import { createHash } from "crypto";
+import { metadataDAPropertiesUtil } from "./metadataDAProperties";
 import { metadataGraphPermissionUtil } from "./metadataGraphPermssion";
 import { metadataRscPermissionUtil } from "./metadataRscPermission";
-import { metadataDAPropertiesUtil } from "./metadataDAProperties";
-import * as path from "path";
 
 class MetadataUtil {
   async parse(ymlPath: string): Promise<Result<ProjectModel, FxError>> {
@@ -55,7 +55,7 @@ class MetadataUtil {
     }
   }
 
-  parseManifest(manifest: TeamsAppManifest | devPreview.DevPreviewSchema): void {
+  parseManifest(manifest: MicrosoftTeamsManifest): void {
     const props: { [key: string]: string } = {};
     const prefix = "manifest.";
     props[prefix + "id"] = manifest.id ?? "";
@@ -78,7 +78,7 @@ class MetadataUtil {
             : "undefined"
         )
         .toString() ?? "";
-    props[prefix + "webApplicationInfo.id"] = manifest.webApplicationInfo?.id ?? "";
+    props[prefix + "webApplicationInfo.id"] = (manifest as any).webApplicationInfo?.id ?? "";
     props[prefix + "extensions"] =
       "extensions" in manifest && manifest["extensions"]?.length != 0 ? "true" : "false";
 
