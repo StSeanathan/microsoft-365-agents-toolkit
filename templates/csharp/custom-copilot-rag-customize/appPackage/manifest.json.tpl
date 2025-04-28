@@ -62,11 +62,11 @@
                     ],
                     "commands": [
                         {
-                            "title": "List Contoso history in table",
+                            "title": "List Contoso company history in table",
                             "description": "Tell me the history of Contoso Electronics, format in a table."
                         },
                         {
-                            "title": "Compare Contoso Electronics plan",
+                            "title": "Compare Contoso Electronics Northwind plan",
                             "description": "Compare different Contoso Electronics benefit package plans"
                         },
                         {
