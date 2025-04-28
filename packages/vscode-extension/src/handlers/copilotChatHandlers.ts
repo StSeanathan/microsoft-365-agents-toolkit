@@ -60,6 +60,11 @@ export async function openGithubCopilotChat(args?: any[]): Promise<Result<null, 
   };
   ExtTelemetry.sendTelemetryEvent(startEventName, triggerFrom);
   try {
+    try {
+      await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", {
+        mode: "ask",
+      });
+    } catch {}
     await vscode.commands.executeCommand("workbench.panel.chat.view.copilot.focus");
     if (query) {
       const options = {
