@@ -119,7 +119,7 @@ export class FeatureFlags {
   };
   static readonly AddODSPKnowledge = {
     name: FeatureFlagName.AddODSPKnowledge,
-    defaultValue: "false",
+    defaultValue: "true",
   };
   static readonly SandBoxedTeam = {
     name: FeatureFlagName.SandBoxedTeam,

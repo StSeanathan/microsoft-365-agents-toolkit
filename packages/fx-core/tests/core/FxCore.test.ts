@@ -9224,6 +9224,53 @@ describe("addKnowledge", async () => {
     assert.isTrue(result.isOk());
   });
 
+  it("happy path2: get ODSP item details", async () => {
+    const core = new FxCore(tools);
+    const fakeAxiosInstance = axios.create();
+    sandbox.stub(oneDriveSharePointHandler, "getODSPItemDetailById").resolves(
+      ok([
+        {
+          id: "fakeId",
+          name: "fakeName",
+        },
+      ])
+    );
+    const result = await core.getODSPItemDetails("fake siteId");
+    assert.isTrue(result.isOk());
+  });
+
+  it("happy path3: get ODSP item details", async () => {
+    const fakeInstance = axios.create();
+    sandbox.stub(axios, "create").returns(fakeInstance);
+    const axiosGetStub = sandbox.stub(fakeInstance, "get");
+    axiosGetStub.onCall(0).resolves({
+      status: 200,
+      data: {
+        id: "fakeId",
+        name: "fakeName",
+      },
+    });
+    const core = new FxCore(tools);
+    const result = await core.getODSPItemDetails("fake siteId");
+    assert.isTrue(result.isOk());
+  });
+
+  it("happy path4: get ODSP item details", async () => {
+    const fakeInstance = axios.create();
+    sandbox.stub(axios, "create").returns(fakeInstance);
+    const axiosGetStub = sandbox.stub(fakeInstance, "get");
+    axiosGetStub.onCall(0).resolves({
+      status: 200,
+      data: {
+        id: "fakeId",
+        webUrl: "https://fakeUrl.com/fakeName",
+      },
+    });
+    const core = new FxCore(tools);
+    const result = await core.getODSPItemDetails("fake siteId");
+    assert.isTrue(result.isOk());
+  });
+
   it("error path: get ODSP item details", async () => {
     const core = new FxCore(tools);
     const result = await core.getODSPItemDetails("fake siteId", "fake itemId");
