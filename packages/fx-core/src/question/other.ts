@@ -60,6 +60,8 @@ import {
   selectExistingPluginManifestQuestion,
   selectOpenAPISpecFromPluginQuestion,
   selectApiOperationForRegenerateQuestion,
+  folderQuestion,
+  appNameQuestion,
 } from "./create";
 import { UninstallInputs } from "./inputs";
 import { manifestUtils } from "../component/driver/teamsApp/utils/ManifestUtils";
@@ -845,6 +847,22 @@ export function addPluginQuestionNode(): IQTreeNode {
       },
       {
         data: selectTeamsAppManifestQuestion(),
+      },
+    ],
+  };
+}
+
+export function metaOSExtendToDAQuestionNode(): IQTreeNode {
+  return {
+    data: {
+      type: "group",
+    },
+    children: [
+      {
+        data: folderQuestion(),
+      },
+      {
+        data: appNameQuestion(),
       },
     ],
   };
