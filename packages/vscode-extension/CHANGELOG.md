@@ -11,6 +11,8 @@ We are excited to announce that our product, evovled from Teams Toolkit, is bein
 
 As we continue to enhance our product, we are shifting our focus from solely supporting Teams development to empowering developers to create Microsoft 365 Copilot agents and other applications across the Microsoft 365 platform. These platforms include Microsoft 365 Copilot, Microsoft Teams, Office family and Outlook. This expansion in scope allows us to better serve our users by providing comprehensive tools, templates and resources for developing a wide variety of Microsoft 365 solutions.
 
+![ATK animation](https://github.com/user-attachments/assets/96e34da7-06a5-4632-9243-db823e9edb51)
+
 The new name, Microsoft 365 Agents Toolkit, better represents the diverse functionalities and capabilities of our product. We believe this change will help our users more easily identify the full range of development opportunities available within the Microsoft 365 environment.
 
 ### New Features
