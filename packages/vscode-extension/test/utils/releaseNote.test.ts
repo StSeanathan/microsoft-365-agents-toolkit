@@ -51,7 +51,7 @@ describe("Release Note", () => {
       } as unknown as vscode.ExtensionContext;
       sandbox.stub(versionUtil, "getExtensionId").returns("");
       sandbox.stub(vscode.extensions, "getExtension").returns({
-        packageJSON: { version: "5.0.0" },
+        packageJSON: { version: "6.0.0" },
         id: "",
         extensionPath: "",
         isActive: true,
@@ -69,51 +69,32 @@ describe("Release Note", () => {
     afterEach(() => {
       sandbox.restore();
     });
-    it("show changelog notification happy path", async () => {
-      const contextSpy = sandbox.spy(context.globalState, "update");
-      sandbox.stub(context.globalState, "get").returns("4.99.0");
-      let title = "";
-      sandbox
-        .stub(vscode.window, "showInformationMessage")
-        .callsFake((_message: string, option: any, ...items: vscode.MessageItem[]) => {
-          title = option.title;
-          return Promise.resolve(option);
-        });
+    it("should show changelog when user upgrades from old version", async () => {
+      const globalStateUpdateSpy = sandbox.spy(context.globalState, "update");
+      sandbox.stub(context.globalState, "get").returns("5.14.1");
       const instance = new ReleaseNote(context);
       await instance.show();
-      chai.assert(title === "Changelog");
-      chai.assert(contextSpy.callCount == 2);
-      chai.assert(telemetryStub.calledWith("show-what-is-new-notification"));
-    });
-    it("should show changelog even if button is not clicked", async () => {
-      const contextSpy = sandbox.spy(context.globalState, "update");
-      sandbox.stub(context.globalState, "get").returns("4.99.0");
-      sandbox.stub(vscode.window, "showInformationMessage").resolves(undefined);
-      const instance = new ReleaseNote(context);
-      await instance.show();
-      chai.assert(contextSpy.callCount == 2);
+      chai.assert(globalStateUpdateSpy.calledTwice);
       chai.assert(telemetryStub.calledOnce);
       chai.assert(openDocumentStub.calledOnce);
     });
-    it("should not show changelog when version is not changed", async () => {
-      const contextSpy = sandbox.spy(context.globalState, "update");
-      sandbox.stub(context.globalState, "get").returns("5.0.0");
-      sandbox.stub(vscode.window, "showInformationMessage").resolves();
+    it("should not show changelog when user has already installed the same version", async () => {
+      const globalStateUpdateSpy = sandbox.spy(context.globalState, "update");
+      sandbox.stub(context.globalState, "get").returns("6.0.0");
       const instance = new ReleaseNote(context);
       await instance.show();
-      sinon.assert.calledOnce(contextSpy);
+      chai.assert(globalStateUpdateSpy.calledOnce);
       chai.assert(telemetryStub.notCalled);
       chai.assert(openDocumentStub.notCalled);
     });
-    it("should not show changelog when it's a fresh install", async () => {
-      const contextSpy = sandbox.spy(context.globalState, "update");
+    it("should show changelog when it's a fresh install", async () => {
+      const globalStateUpdateSpy = sandbox.spy(context.globalState, "update");
       sandbox.stub(context.globalState, "get").returns(undefined);
-      sandbox.stub(vscode.window, "showInformationMessage").resolves();
       const instance = new ReleaseNote(context);
       await instance.show();
-      sinon.assert.calledOnce(contextSpy);
-      chai.assert(telemetryStub.notCalled);
-      chai.assert(openDocumentStub.notCalled);
+      chai.assert(globalStateUpdateSpy.calledOnce);
+      chai.assert(telemetryStub.calledOnce);
+      chai.assert(openDocumentStub.calledOnce);
     });
   });
 
