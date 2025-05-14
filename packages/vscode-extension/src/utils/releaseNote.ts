@@ -1,13 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import * as util from "util";
 import * as vscode from "vscode";
 import { PrereleaseState, SyncedState, UserState } from "../constants";
 import * as folder from "../folder";
 import { ExtTelemetry } from "../telemetry/extTelemetry";
 import { TelemetryEvent } from "../telemetry/extTelemetryEvents";
-import { localize } from "./localizeUtils";
 import * as versionUtil from "./versionUtil";
 
 export class ReleaseNote {
@@ -40,32 +38,15 @@ export class ReleaseNote {
     } else {
       const currentStableVersion = this.context.globalState.get<string>(SyncedState.Version);
       await this.context.globalState.update(SyncedState.Version, teamsToolkitVersion);
-      if (
-        currentStableVersion !== undefined &&
-        versionUtil.compare(teamsToolkitVersion, currentStableVersion) === 1
-      ) {
+
+      if (currentStableVersion === undefined) {
+        // it is new user
+        ExtTelemetry.sendTelemetryEvent(TelemetryEvent.ShowWhatIsNewNotification);
+        await this.showChangelog("CHANGELOG.md");
+      } else if (versionUtil.compare(teamsToolkitVersion, currentStableVersion) === 1) {
         // it is existinig user
         await this.context.globalState.update(UserState.IsExisting, "yes");
         ExtTelemetry.sendTelemetryEvent(TelemetryEvent.ShowWhatIsNewNotification);
-
-        const changelog = {
-          title: localize("teamstoolkit.upgrade.changelog"),
-          run: async (): Promise<void> => {
-            await this.showChangelog("CHANGELOG.md");
-          },
-        };
-
-        void vscode.window
-          .showInformationMessage(
-            util.format(localize("teamstoolkit.upgrade.banner"), teamsToolkitVersion),
-            changelog
-          )
-          .then(async (selection) => {
-            if (selection?.title === localize("teamstoolkit.upgrade.changelog")) {
-              ExtTelemetry.sendTelemetryEvent(TelemetryEvent.ShowWhatIsNewContext);
-              await selection.run();
-            }
-          });
         await this.showChangelog("CHANGELOG.md");
       }
     }
