@@ -60,6 +60,8 @@ import {
   selectExistingPluginManifestQuestion,
   selectOpenAPISpecFromPluginQuestion,
   selectApiOperationForRegenerateQuestion,
+  folderQuestion,
+  appNameQuestion,
 } from "./create";
 import { UninstallInputs } from "./inputs";
 import { manifestUtils } from "../component/driver/teamsApp/utils/ManifestUtils";
@@ -822,30 +824,45 @@ export function addPluginQuestionNode(): IQTreeNode {
           equals: ActionStartOptions.existingPlugin().id,
         },
       },
-      ...(featureFlagManager.getBooleanValue(FeatureFlags.KiotaNPMIntegration)
-        ? [inputOrSearchAPISpecNode()]
-        : [
-            {
-              data: apiSpecLocationQuestion(),
-              condition: (inputs: Inputs) => {
-                return (
-                  !featureFlagManager.getBooleanValue(FeatureFlags.KiotaIntegration) &&
-                  inputs[QuestionNames.ActionType] === ActionStartOptions.apiSpec().id
-                );
-              },
-            },
-            {
-              data: apiOperationQuestion(true, true),
-              condition: (inputs: Inputs) => {
-                return (
-                  !featureFlagManager.getBooleanValue(FeatureFlags.KiotaIntegration) &&
-                  inputs[QuestionNames.ActionType] === ActionStartOptions.apiSpec().id
-                );
-              },
-            },
-          ]),
+      ...[inputOrSearchAPISpecNode()],
+      {
+        data: apiSpecLocationQuestion(),
+        condition: (inputs: Inputs) => {
+          return (
+            !featureFlagManager.getBooleanValue(FeatureFlags.KiotaNPMIntegration) &&
+            !featureFlagManager.getBooleanValue(FeatureFlags.KiotaIntegration) &&
+            inputs[QuestionNames.ActionType] === ActionStartOptions.apiSpec().id
+          );
+        },
+      },
+      {
+        data: apiOperationQuestion(true, true),
+        condition: (inputs: Inputs) => {
+          return (
+            !featureFlagManager.getBooleanValue(FeatureFlags.KiotaNPMIntegration) &&
+            !featureFlagManager.getBooleanValue(FeatureFlags.KiotaIntegration) &&
+            inputs[QuestionNames.ActionType] === ActionStartOptions.apiSpec().id
+          );
+        },
+      },
       {
         data: selectTeamsAppManifestQuestion(),
+      },
+    ],
+  };
+}
+
+export function metaOSExtendToDAQuestionNode(): IQTreeNode {
+  return {
+    data: {
+      type: "group",
+    },
+    children: [
+      {
+        data: folderQuestion(),
+      },
+      {
+        data: appNameQuestion(),
       },
     ],
   };
@@ -900,7 +917,7 @@ export function addKnowledgeQuestionNode(): IQTreeNode {
           },
         ],
       },
-      // Copilot Connector
+      // Copilot connector
       {
         data: GCItemQuestion(),
         condition: {

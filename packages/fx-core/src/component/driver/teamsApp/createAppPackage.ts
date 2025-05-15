@@ -73,9 +73,7 @@ export class CreateAppPackageDriver implements StepDriver {
     // TODO: use constant after previous pr merged
     const generatedFolder = path.join(context.projectPath, "appPackage", ".generated");
     const hasTTKGeneratedFolder =
-      featureFlagManager.getBooleanValue(FeatureFlags.TypeSpec) &&
-      fs.existsSync(generatedFolder) &&
-      fs.existsSync(path.join(generatedFolder, "manifest.json"));
+      fs.existsSync(generatedFolder) && fs.existsSync(path.join(generatedFolder, "manifest.json"));
 
     let manifestPath = hasTTKGeneratedFolder
       ? path.join(generatedFolder, "manifest.json")
@@ -412,7 +410,7 @@ export class CreateAppPackageDriver implements StepDriver {
 
     const builtSuccess = [
       { content: "(√)Done: ", color: Colors.BRIGHT_GREEN },
-      { content: "Teams Package ", color: Colors.BRIGHT_WHITE },
+      { content: "App Package ", color: Colors.BRIGHT_WHITE },
       { content: zipFileName, color: Colors.BRIGHT_MAGENTA },
       { content: " built successfully!", color: Colors.BRIGHT_WHITE },
     ];

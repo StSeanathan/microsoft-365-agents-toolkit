@@ -31,6 +31,7 @@ import { kiotageneratePlugin, listAPITreeInfo } from "./kiotaClient";
 import {
   KiotaOpenApiNode,
   KiotaTreeResult,
+  OpenApiSpecVersion,
   SecurityRequirementObject,
   SecuritySchemeObject,
 } from "@microsoft/kiota";
@@ -147,7 +148,7 @@ export async function generatePlugin(
       outputAPISpecPath = outputSpecWithoutExt + ".yaml";
     }
 
-    await fs.copyFile(apiSpecPath, outputAPISpecPath);
+    await fs.copy(apiSpecPath, outputAPISpecPath);
 
     const adaptiveCardsFolder = path.join(path.dirname(apiSpecPath), "adaptiveCards");
     const destAdaptiveCardsFolder = path.join(path.dirname(outputAIPluginPath), "adaptiveCards");
@@ -170,7 +171,7 @@ export async function generatePlugin(
       const originalSpecFile = path.join(originalSpecFolder, originalSpecFilename);
 
       const outputOriginalSpecPath = outputAPISpecPath + ".original";
-      await fs.copyFile(originalSpecFile, outputOriginalSpecPath);
+      await fs.copy(originalSpecFile, outputOriginalSpecPath);
       generatedPluginManifest.runtimes?.forEach((runtime) => {
         (runtime as RuntimeObjectOpenapi).spec.url = normalizedPath;
       });
@@ -279,7 +280,14 @@ export async function parseAndUpdatePluginManifestForKiota(
   return authData;
 }
 
-export async function listAPIInfo(specPath: string, platform?: string): Promise<ListAPIResult> {
+export async function listAPIInfo(
+  specPath: string,
+  platform?: string
+): Promise<
+  ListAPIResult & {
+    specVersion?: OpenApiSpecVersion;
+  }
+> {
   const allowAPIKeyAuth = platform !== Platform.VS;
   const allowBearerTokenAuth = platform !== Platform.VS;
   const allowOauth2 = platform !== Platform.VS;
@@ -301,6 +309,7 @@ export async function listAPIInfo(specPath: string, platform?: string): Promise<
       }
     }
     return {
+      specVersion: treeInfo.specVersion,
       allAPICount: operations.length,
       validAPICount: operations.filter((api) => api.isValid).length,
       APIs: operations,
@@ -324,8 +333,7 @@ export async function validateOpenAPISpec(
   platform?: string
 ): Promise<ValidateResult> {
   if (featureFlagManager.getBooleanValue(FeatureFlags.KiotaNPMIntegration)) {
-    let hash = "";
-    let apiInfo: ListAPIResult;
+    let apiInfo: ListAPIResult & { specVersion?: OpenApiSpecVersion };
     try {
       apiInfo = await listAPIInfo(specPath, platform);
     } catch (e) {
@@ -341,7 +349,7 @@ export async function validateOpenAPISpec(
             ),
           },
         ],
-        specHash: hash,
+        specHash: "",
       };
     }
 
@@ -356,22 +364,39 @@ export async function validateOpenAPISpec(
         status: ValidationStatus.Error,
         warnings: [],
         errors: [{ type: ErrorType.NoSupportedApi, content: "", data: data }],
-        specHash: hash,
+        specHash: "",
       };
+    }
+
+    const result: ValidateResult = {
+      status: ValidationStatus.Valid,
+      warnings: [],
+      errors: [],
+      specHash: "",
+    };
+
+    if (apiInfo.specVersion === OpenApiSpecVersion.V2_0) {
+      result.warnings.push({
+        type: WarningType.ConvertSwaggerToOpenAPI,
+        content: ConstantString.ConvertSwaggerToOpenAPI,
+      });
+    }
+
+    // TODO: curently kiota will generate spec with version 3.0.4, if it changed in the future, we need to update this
+    if (apiInfo.specVersion === OpenApiSpecVersion.V3_1) {
+      result.warnings.push({
+        type: WarningType.OpenAPI31ConvertTo30,
+        content: ConstantString.OpenAPI31ConvertTo30,
+      });
     }
 
     const serverUrl = apiInfo.APIs.find((api) => api.isValid)?.server;
     if (serverUrl) {
       const serverString = JSON.stringify(serverUrl);
-      hash = createHash("sha256").update(serverString).digest("hex");
+      result.specHash = createHash("sha256").update(serverString).digest("hex");
     }
 
-    return {
-      status: ValidationStatus.Valid,
-      warnings: [],
-      errors: [],
-      specHash: hash,
-    };
+    return result;
   }
 
   const options: ParseOptions = {

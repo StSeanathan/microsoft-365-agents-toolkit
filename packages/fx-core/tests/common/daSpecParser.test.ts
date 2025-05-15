@@ -45,12 +45,13 @@ describe("daSpecParser", () => {
   });
 
   describe("listAPIInfo with KiotaNPMIntegration enabled", () => {
-    it("should return empty result when treeInfo is undefined", async () => {
-      listAPITreeInfoStub.resolves(undefined);
+    it("should return empty result when treeInfo is {}", async () => {
+      listAPITreeInfoStub.resolves({});
 
       const result = await daSpecParser.listAPIInfo("path/to/spec");
 
       assert.deepEqual(result, {
+        specVersion: undefined,
         allAPICount: 0,
         validAPICount: 0,
         APIs: [],
@@ -63,6 +64,7 @@ describe("daSpecParser", () => {
       const result = await daSpecParser.listAPIInfo("path/to/spec");
 
       assert.deepEqual(result, {
+        specVersion: undefined,
         allAPICount: 0,
         validAPICount: 0,
         APIs: [],
@@ -826,7 +828,7 @@ describe("daSpecParser", () => {
         security: [],
         securitySchemes: {},
         logs: [],
-        specVersion: OpenApiSpecVersion.V3_0,
+        specVersion: OpenApiSpecVersion.V2_0,
       };
 
       listAPITreeInfoStub.resolves(mockTreeInfo);
@@ -843,7 +845,8 @@ describe("daSpecParser", () => {
 
       assert.equal(result.status, ValidationStatus.Valid);
       assert.isEmpty(result.errors);
-      assert.isEmpty(result.warnings);
+      assert.isTrue(result.warnings.length === 1);
+      assert.isTrue(result.warnings[0].type === WarningType.ConvertSwaggerToOpenAPI);
 
       const expectedHash = require("crypto")
         .createHash("sha256")
@@ -868,7 +871,7 @@ describe("daSpecParser", () => {
         security: [],
         securitySchemes: {},
         logs: [],
-        specVersion: OpenApiSpecVersion.V3_0,
+        specVersion: OpenApiSpecVersion.V3_1,
       };
 
       listAPITreeInfoStub.resolves(mockTreeInfo);
@@ -883,6 +886,8 @@ describe("daSpecParser", () => {
 
       const result = await daSpecParser.validateOpenAPISpec("path/to/spec", Platform.VS);
       assert.equal(result.status, ValidationStatus.Valid);
+      assert.isTrue(result.warnings.length === 1);
+      assert.isTrue(result.warnings[0].type === WarningType.OpenAPI31ConvertTo30);
     });
   });
 
@@ -931,7 +936,6 @@ describe("daSpecParser", () => {
       const fsReadJSONStub = sinon
         .stub(require("fs-extra"), "readJSON")
         .resolves({ name: { short: "test-app" } });
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
       const fsCopyStub = sinon.stub(require("fs-extra"), "copy").resolves();
 
@@ -955,11 +959,9 @@ describe("daSpecParser", () => {
       assert.deepEqual(kiotaGeneratePluginStub.firstCall.args[2], "testapp");
       assert.deepEqual(kiotaGeneratePluginStub.firstCall.args[6], ["/users#GET", "/messages#POST"]);
 
-      assert.equal(fsCopyFileStub.callCount, 2);
+      assert.equal(fsCopyStub.callCount, 3);
 
-      assert.equal(fsCopyStub.callCount, 1);
-
-      const copyCallArgs = fsCopyStub.firstCall.args;
+      const copyCallArgs = fsCopyStub.secondCall.args;
       assert.isTrue(copyCallArgs[0].replace(/\\/g, "/").endsWith("adaptiveCards"));
       assert.isTrue(copyCallArgs[0].replace(/\\/g, "/").endsWith("adaptiveCards"));
 
@@ -971,15 +973,15 @@ describe("daSpecParser", () => {
         },
         "Copy options don't match"
       );
-
       assert.isTrue(
-        fsCopyFileStub.firstCall.calledWith(
+        fsCopyStub.firstCall.calledWith(
           pathMatcher("c:/tmp/working-dir/plugin/openapi.yaml"),
           pathMatcher("path/to/output/openapi.yaml")
         )
       );
+
       assert.isTrue(
-        fsCopyFileStub.secondCall.calledWith(
+        fsCopyStub.thirdCall.calledWith(
           pathMatcher("c:/tmp/working-dir/.kiota/documents/testapp/openapi.json"),
           pathMatcher("path/to/output/openapi.yaml.original")
         )
@@ -1049,7 +1051,7 @@ describe("daSpecParser", () => {
       const fsReadJSONStub = sinon
         .stub(require("fs-extra"), "readJSON")
         .resolves({ name: { short: "test-app" } });
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       const result = await daSpecParser.generatePlugin(
@@ -1076,14 +1078,13 @@ describe("daSpecParser", () => {
       );
 
       assert.isTrue(
-        fsCopyFileStub.calledWith(
+        fsCopyStub.firstCall.calledWith(
           pathMatcher("c:/tmp/working-dir/plugin/openapi.yaml"),
           pathMatcher("path/to/output/openapi.yaml")
         )
       );
-
       assert.isTrue(
-        fsCopyFileStub.calledWith(
+        fsCopyStub.secondCall.calledWith(
           pathMatcher("c:/tmp/working-dir/.kiota/documents/testapp/openapi.json"),
           pathMatcher("path/to/output/openapi.yaml.original")
         )
@@ -1099,7 +1100,7 @@ describe("daSpecParser", () => {
 
       const readdirStub = sinon.stub(require("fs-extra"), "readdir").resolves(["openapi.json"]);
       const fsReadJSONStub = sinon.stub(require("fs-extra"), "readJSON").resolves(complexManifest);
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       await daSpecParser.generatePlugin(
@@ -1131,7 +1132,7 @@ describe("daSpecParser", () => {
           },
         ],
       });
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       await daSpecParser.generatePlugin(
@@ -1169,7 +1170,7 @@ describe("daSpecParser", () => {
 
       const readdirStub = sinon.stub(require("fs-extra"), "readdir").resolves(["openapi.json"]);
       const fsReadJSONStub = sinon.stub(require("fs-extra"), "readJSON").resolves(pluginManifest);
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       await daSpecParser.generatePlugin(
@@ -1212,7 +1213,7 @@ describe("daSpecParser", () => {
       const fsReadJSONStub = sinon
         .stub(require("fs-extra"), "readJSON")
         .resolves({ name: { short: "test-app" } });
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       await daSpecParser.generatePlugin(
@@ -1254,7 +1255,7 @@ describe("daSpecParser", () => {
       const fsReadJSONStub = sinon
         .stub(require("fs-extra"), "readJSON")
         .resolves({ name: { short: "test-app" } });
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       const result = await daSpecParser.generatePlugin(
@@ -1276,7 +1277,7 @@ describe("daSpecParser", () => {
       const fsReadJSONStub = sinon
         .stub(require("fs-extra"), "readJSON")
         .resolves({ name: { short: "test-app" } });
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       await daSpecParser.generatePlugin(
@@ -1289,7 +1290,7 @@ describe("daSpecParser", () => {
       );
 
       assert.isTrue(
-        fsCopyFileStub.calledWith(
+        fsCopyFileStub.secondCall.calledWith(
           pathMatcher("c:/tmp/working-dir/.kiota/documents/testapp/openapi.json"),
           pathMatcher("path/to/output/openapi.yaml.original")
         )
@@ -1319,7 +1320,7 @@ describe("daSpecParser", () => {
     it("should handle original spec file properly based on updateExistingPlugin flag", async () => {
       const readdirStub = sinon.stub(require("fs-extra"), "readdir").resolves(["openapi.json"]);
       const fsReadJSONStub = sinon.stub(require("fs-extra"), "readJSON");
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
+      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copy").resolves();
       const fsWriteJsonStub = sinon.stub(require("fs-extra"), "writeJson").resolves();
 
       fsReadJSONStub.resolves({
@@ -1379,7 +1380,6 @@ describe("daSpecParser", () => {
 
     it("should properly filter and merge functions when updating existing plugin", async () => {
       const readdirStub = sinon.stub(require("fs-extra"), "readdir").resolves(["openapi.json"]);
-      const fsCopyFileStub = sinon.stub(require("fs-extra"), "copyFile").resolves();
       const fsReadJSONStub = sinon.stub(require("fs-extra"), "readJSON");
       const fsPathExistsStub = sinon.stub(require("fs-extra"), "pathExists").resolves(true);
       const fsCopyStub = sinon.stub(require("fs-extra"), "copy").resolves();
@@ -1487,8 +1487,8 @@ describe("daSpecParser", () => {
         )
       );
 
-      assert.equal(fsCopyStub.callCount, 1);
-      const copyCallArgs = fsCopyStub.firstCall.args;
+      assert.equal(fsCopyStub.callCount, 2);
+      const copyCallArgs = fsCopyStub.secondCall.args;
       assert.isTrue(copyCallArgs[0].replace(/\\/g, "/").endsWith("adaptiveCards"));
       assert.isTrue(copyCallArgs[0].replace(/\\/g, "/").endsWith("adaptiveCards"));
       assert.deepEqual(
@@ -1500,9 +1500,8 @@ describe("daSpecParser", () => {
         "Copy options don't match"
       );
 
-      assert.equal(fsCopyFileStub.callCount, 1);
       assert.isFalse(
-        fsCopyFileStub.calledWith(
+        fsCopyStub.firstCall.calledWith(
           pathMatcher("c:/tmp/working-dir/.kiota/documents/testapp/openapi.json"),
           sinon.match.any
         )
