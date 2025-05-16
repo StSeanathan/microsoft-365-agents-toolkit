@@ -58,6 +58,13 @@ To enhance the developer experience for pro-code agent builders, we see strong v
 
 ### Bug Fix
 
+- Enhanced compatibility with previous version of YAML files using old names to ensure smoother migration or continued use of existing projects.
+  
+- Upgraded dependencies like `axios` to address security vulnerabilities.
+
+- Clear error messages for troubleshooting: Enhanced error messages by explicitly showing YAML file names where missing or unresolved environment variables or no valid app catelog. Show clear error messages to make it easier for users to identify and resolve configuration issues.
+
+- Enhanced logging for CDP client and telemetry for agents development activites.
 
 ## 5.14.1 - Mar 28, 2025
 This patch version update of Teams Toolkit includes several incremental enhancements and bug fixes:
