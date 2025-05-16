@@ -31,7 +31,7 @@ Expand your agent’s knowledge base by integrating Copilot connectors. These co
 
 - **Kiota Integration for Declarative Agents**
 
-We’ve added Kiota integration to streamline working with OpenAPI specifications in declarative agent projects. Developers often need to handle OpenAPI documents when defining actions, this update enables developers to search Open API description documentations and easily regenerate actions. The toolkit now uses Kiota to read, process, and generate code from OpenAPI files—making it easier and more consistent to define and consume external APIs within your declarative agents.
+We’ve added [Kiota](https://aka.ms/kiota/docs) integration to streamline working with OpenAPI specifications in declarative agent projects. Developers often need to handle OpenAPI documents when defining actions, this update enables developers to search Open API description documentations and easily regenerate actions. The toolkit now uses Kiota to read, process, and generate code from OpenAPI files—making it easier and more consistent to define and consume external APIs within your declarative agents.
 
 <img width="865" alt="image" src="https://github.com/user-attachments/assets/906dc3a3-ec83-4cb0-a73d-d1a207876a19" />
 
