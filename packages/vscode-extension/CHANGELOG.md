@@ -25,7 +25,7 @@ The name — Microsoft 365 Agents Toolkit - better represents the full range of 
 
 - **Leverage Copilot Connectors in Declarative Agents**
 
-Expand your agent’s knowledge base by integrating Copilot connectors. These connectors let you ingest data from third-party APIs into Microsoft Graph, which can then be used within declarative agents. You can add a Copilot connector when creating a declarative agent or use the "Copilot Connectors" template to build and extend your solution to declarative agents later.
+Expand your agent’s knowledge base by integrating Copilot connectors. These connectors let you ingest data from third-party data sources into Microsoft Graph, which can then be used within Microsoft 365 Copilot or through a declarative agent. You can add a Copilot connector when creating a declarative agent or use the "Copilot Connectors" template to build and extend your solution to declarative agents later.
 
 <img width="1088" alt="copilot-connector-in-DA" src="https://github.com/user-attachments/assets/5d9a4e48-a9ba-45a4-a7a3-1797cf0fc3f7" />
 
