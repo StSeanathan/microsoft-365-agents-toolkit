@@ -52,6 +52,9 @@ To enhance the developer experience for pro-code agent builders, we see strong v
 
 ### Enhancement
 
+- **Smooth installation for Microsoft 365 Agents Playground**: The toolkit will automatically install NodeJS to avoid unnecessary errors in Microsoft 365 Agents Playground installation, for users who don't have NodeJS installed on their machine.
+
+- **Support SharePoint Framework v1.21**: For Teams tab app using SharePoint Framework, we upgrade to support v1.21.
 
 ### Bug Fix
 
