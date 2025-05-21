@@ -213,7 +213,7 @@ export {
   Convert as ApiPluginManifestV2D2Convert,
 } from "./copilot/plugin/ApiPluginManifestV2D2";
 export type APIPluginManifest = APIPluginManifestV2D1 | APIPluginManifestV2D2 | APIPluginManifestV2D3;
-export type APIPluginManifestLatest = APIPluginManifestV2D2;
+export type APIPluginManifestLatest = APIPluginManifestV2D3;
 
 export type AppManifest = TeamsManifest | DeclarativeAgentManifest | APIPluginManifest;
 
