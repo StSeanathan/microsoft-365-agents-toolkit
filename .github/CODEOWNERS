@@ -363,7 +363,10 @@
 /templates/**/sso-tab-with-obo-flow @Yimin-Jin @hund030 @huimiu @eriolchan
 /templates/**/workflow @kimizhu @dooriya @swatDong
 /templates/constraints/yml/actions @hund030 @eriolchan @huimiu
-/templates/python @adashen @blackchoey @frankqianms
+
+/templates/vsc/python @adashen @blackchoey @frankqianms
 /templates/scripts @hund030 @eriolchan @huimiu
-/templates/csharp/custom-copilot-* @adashen @blackchoey @frankqianms @xzf0587 
-/templates/common/declarative-agent-typespec @KennethBWSong @SLdragon @adashen
+/templates/vs/csharp/custom-copilot-* @adashen @blackchoey @frankqianms @xzf0587 
+/templates/vsc/common/declarative-agent-typespec @KennethBWSong @SLdragon @adashen
+/templates/vsc/* @adashen @wenytang-ms
+/templates/vs/* @adashen @wenytang-ms
