@@ -25,9 +25,9 @@ on:
         required: false
         type: string
 
-  # pull_request:
-  # schedule:
-  #   - cron: "0 18 * * *"
+  
+  schedule:
+    - cron: "0 18 * * *"
 
 permissions:
   actions: read
