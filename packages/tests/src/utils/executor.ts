@@ -54,13 +54,17 @@ export class Executor {
               return { success: true, ...result };
             }
           }
-          // the command exit with 0
-          console.log(
-            `[Pending] "${command}" in ${cwd} with some stderr: ${result.stderr}`
-          );
+          console.log(`[Pending] "${command}" in ${cwd} with some stderr:`);
+          console.log(`[STDERR] ${result.stderr}`);
+          if (result.stdout) {
+            console.log(`[STDOUT] ${result.stdout}`);
+          }
           return { success: false, ...result };
         } else {
           console.log(`[Success] "${command}" in ${cwd}.`);
+          if (result.stdout) {
+            console.log(`[STDOUT] ${result.stdout}`);
+          }
           return { success: true, ...result };
         }
       } catch (e: any) {
@@ -70,10 +74,24 @@ export class Executor {
           console.error(
             `[Failed] "${command}" in ${cwd} with error: ${e.message}`
           );
+          if (e.stdout) {
+            console.log(`[Error STDOUT] ${e.stdout}`);
+          }
+          if (e.stderr) {
+            console.log(`[Error STDERR] ${e.stderr}`);
+          }
+          if (e.code !== undefined) {
+            console.log(`[Error Code] ${e.code}`);
+          }
         }
         retryCount++;
         if (retryCount >= maxRetries) {
-          return { success: false, stdout: "", stderr: e.message as string };
+          return {
+            success: false,
+            stdout: e.stdout || "",
+            stderr: e.stderr || (e.message as string),
+            code: e.code,
+          };
         }
 
         console.log(
