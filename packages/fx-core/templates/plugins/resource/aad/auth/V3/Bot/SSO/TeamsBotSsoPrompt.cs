@@ -9,12 +9,11 @@ using Microsoft.Agents.Builder.Dialogs.Prompts;
 using Microsoft.Agents.Core.Models;
 using Microsoft.Agents.Extensions.Teams.Models;
 using Microsoft.Identity.Client;
-using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.IdentityModel.Tokens.Jwt;
-using bowsong080401botsso.Configuration;
-using bowsong080401botsso.SSO;
+using {{YOUR_NAMESPACE}}.Configuration;
+using {{YOUR_NAMESPACE}}.SSO;
 using System.Text.Json;
 using Json.More;
 
