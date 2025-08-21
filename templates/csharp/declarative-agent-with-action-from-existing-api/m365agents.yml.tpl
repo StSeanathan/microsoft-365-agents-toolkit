@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=https://aka.ms/teams-toolkit/v1.8/yaml.schema.json
 # Visit https://aka.ms/teamsfx-v5.0-guide for details on this file
 # Visit https://aka.ms/teamsfx-actions for details on actions
+# Test online template 17.0.0
 version: v1.8
 
 environmentFolderPath: ./env
