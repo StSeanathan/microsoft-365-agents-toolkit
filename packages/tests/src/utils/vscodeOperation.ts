@@ -556,7 +556,8 @@ export async function createNewProject(
       | "Azure AI Search"
       | "Custom API"
       | "Microsoft 365";
-    authOption?: "None" | "API Key" | "MicrosoftEntra" | "Oauth";
+    authOption?: "None" | "API Key" | "Microsoft Entra" | "OAuth";
+    apiAuthOption?: "None" | "Custom API Key" | "Bearer token" | "OAuth";
   }
 ): Promise<void> {
   const driver = VSBrowser.instance.driver;
@@ -578,6 +579,7 @@ export async function createNewProject(
   const lang = option?.lang ? option.lang : "JavaScript";
   const dataOption = option?.dataOption ? option.dataOption : "Customize";
   const authOption = option?.authOption ? option.authOption : "None";
+  const apiAuthOption = option?.apiAuthOption ? option.apiAuthOption : "None";
   await RetryHandler.retry(async () => {
     await execCommandIfExist(
       CommandPaletteCommands.CreateProjectCommand,
@@ -1074,6 +1076,41 @@ export async function createNewProject(
       await input.selectQuickPick(lang);
       break;
     }
+    case "weather": {
+      await input.selectQuickPick(CreateProjectQuestion.CustomCopilot);
+      await driver.sleep(Timeout.input);
+      await input.selectQuickPick(CreateProjectQuestion.WeatherAgent);
+      await driver.sleep(Timeout.input);
+      // choose ai type
+      await input.setText(aiType);
+      await driver.sleep(Timeout.input);
+      await input.confirm();
+      await driver.sleep(Timeout.input);
+      await input.confirm();
+      // Choose programming language
+      await input.selectQuickPick(lang);
+      break;
+    }
+    case "daOpenAPI": {
+      if (apiAuthOption.toLowerCase() === "none") {
+        const openAPIPath =
+          "https://raw.githubusercontent.com/SLdragon/example-openapi-spec/main/real-no-auth.yaml";
+        await createDaByopenapi(openAPIPath, driver, input);
+      } else if (apiAuthOption.toLowerCase() === "bearer token") {
+        const openAPIPath =
+          "https://raw.githubusercontent.com/SLdragon/example-openapi-spec/refs/heads/main/real-bearer.yaml";
+        await createDaByopenapi(openAPIPath, driver, input);
+      } else if (apiAuthOption.toLowerCase() === "custom api key") {
+        const openAPIPath =
+          "https://raw.githubusercontent.com/SLdragon/example-openapi-spec/refs/heads/main/real-custom-api-key.yaml";
+        await createDaByopenapi(openAPIPath, driver, input);
+      } else if (apiAuthOption.toLowerCase() === "oauth") {
+        const openAPIPath =
+          "https://raw.githubusercontent.com/SLdragon/example-openapi-spec/refs/heads/main/real-oauth.yaml";
+        await createDaByopenapi(openAPIPath, driver, input);
+      }
+      break;
+    }
     default:
       break;
   }
@@ -1528,6 +1565,34 @@ export async function createNewProjectByApispec(
   await inputFolderPath(driver, input, apispec);
   await input.confirm();
   await driver.sleep(Timeout.shortTimeWait);
+  const ckAll = await driver.findElement(
+    By.css(".quick-input-header .monaco-checkbox")
+  );
+  await ckAll?.click();
+  await driver.sleep(Timeout.input);
+  await input.confirm();
+}
+
+export async function createDaByopenapi(
+  openapi: string,
+  driver: WebDriver,
+  input: InputBox
+): Promise<void> {
+  await input.selectQuickPick(CreateProjectQuestion.DeclarativeAgent);
+  await driver.sleep(Timeout.input);
+  await input.selectQuickPick("Add an Action");
+  await driver.sleep(Timeout.input);
+  await input.selectQuickPick("Start with an OpenAPI Description Document");
+  await driver.sleep(Timeout.input);
+  await input.selectQuickPick(
+    "Enter OpenAPI Description Document Location or Open File..."
+  );
+  await driver.sleep(Timeout.input);
+  await input.selectQuickPick("Enter OpenAPI Description Document Location");
+  await driver.sleep(Timeout.input);
+  await inputFolderPath(driver, input, openapi);
+  await input.confirm();
+  await driver.sleep(Timeout.loadOpenAPI);
   const ckAll = await driver.findElement(
     By.css(".quick-input-header .monaco-checkbox")
   );

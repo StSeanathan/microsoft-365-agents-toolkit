@@ -279,6 +279,8 @@ export class Timeout {
 
   // open API
   public static readonly openAPIProvision: number = 20 * 1000;
+
+  public static readonly loadOpenAPI: number = 10 * 1000;
 }
 
 export class TreeViewCommands {
@@ -398,7 +400,9 @@ export type AppType =
   | "importspfx"
   | "msgmulparams"
   | "msgapikeyspec"
-  | "daAction";
+  | "daAction"
+  | "weather"
+  | "daOpenAPI";
 
 export class FeatureFlagName {
   static readonly InsiderPreview = "__TEAMSFX_INSIDER_PREVIEW";
@@ -479,6 +483,7 @@ export class LocalDebugTaskInfo {
 
 export class DebugItemSelect {
   static readonly DebugInTeamsUsingChrome = "Debug in Teams (Chrome)";
+  static readonly DebugInCopilotUsingChrome = "Debug in Copilot (Chrome)";
   static readonly DebugInAgentsPlayground =
     "Debug in Microsoft 365 Agents Playground";
 }
@@ -527,6 +532,7 @@ export class CreateProjectQuestion {
   static readonly DeclarativeAgent = "Declarative Agent";
   static readonly BasicCustomEngineAgent = "Basic Custom Engine Agent";
   static readonly BasicAgentForTeams = "Basic Agent for Teams";
+  static readonly WeatherAgent = "Weather Agent";
 }
 
 export class ValidationContent {
@@ -541,6 +547,9 @@ export class ValidationContent {
   static readonly AiBotErrorMessage3 = "The bot encountered an error or bug";
   static readonly AiBotErrorMessage2 = "An AI request failed";
   static readonly AiBotMeetingMessage = "Team Meeting";
+  static readonly WeatherBotMessageWelcomeInstruction =
+    "Hello and Welcome! I'm here to help with all your weather forecast needs!";
+  static readonly WeatherBotMessage = "Weather Forecast for San Francisco";
 }
 
 export class CliVersion {
