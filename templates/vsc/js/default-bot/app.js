@@ -1,4 +1,4 @@
-const { stripMentionsText, TokenCredentials } = require("@microsoft/teams.api");
+const { stripMentionsText } = require("@microsoft/teams.api");
 const { App } = require("@microsoft/teams.apps");
 const { LocalStorage } = require("@microsoft/teams.common");
 const config = require("./config");
