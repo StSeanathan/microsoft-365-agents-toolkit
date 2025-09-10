@@ -259,6 +259,14 @@ export function getTeamsProjectTypeByCapability(capability: string): string {
     ].includes(capability)
   ) {
     return TeamsProjectTypeOptions.meOptionId;
+  } else if (
+    [
+      CustomCopilotCapabilityOptions.basicChatbot().id,
+      CustomCopilotCapabilityOptions.customCopilotRag().id,
+      CustomCopilotCapabilityOptions.aiAgent().id,
+    ].includes(capability)
+  ) {
+    return capability;
   }
   return "";
 }

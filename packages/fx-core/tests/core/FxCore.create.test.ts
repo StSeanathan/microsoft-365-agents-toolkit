@@ -83,17 +83,35 @@ describe("FxCore.createProject", () => {
     assert.isTrue(res.isOk());
   });
 
-  it("create teams agent without key", async () => {
+  it("create teams agent without AI key", async () => {
     sandbox.stub(coordinator, "create").resolves(ok({ projectPath: "" }));
     const inputs: Inputs = {
-      platform: Platform.VSCode,
+      platform: Platform.CLI,
+      nonInteractive: true,
       [QuestionNames.Scratch]: ScratchOptions.yes().id,
       [QuestionNames.ProjectType]: ProjectTypeOptions.teamsOptionId,
       [QuestionNames.TeamsAppType]: "custom-copilot-basic",
       [QuestionNames.LLMService]: "llm-service-azure-openai",
-      [QuestionNames.AzureOpenAIKey]: "",
-      [QuestionNames.AzureOpenAIEndpoint]: "",
-      [QuestionNames.AzureOpenAIDeploymentName]: "",
+      [QuestionNames.ProgrammingLanguage]: "javascript",
+      [QuestionNames.Folder]: os.tmpdir(),
+      [QuestionNames.AppName]: randomAppName(),
+    };
+    sandbox.stub(tools, "logProvider").value(undefined);
+    const core = new FxCore(tools);
+    const res = await core.createProject(inputs);
+    assert.isTrue(res.isOk());
+  });
+
+  it("create teams agent without AI endpoint", async () => {
+    sandbox.stub(coordinator, "create").resolves(ok({ projectPath: "" }));
+    const inputs: Inputs = {
+      platform: Platform.CLI,
+      nonInteractive: true,
+      [QuestionNames.Scratch]: ScratchOptions.yes().id,
+      [QuestionNames.ProjectType]: ProjectTypeOptions.teamsOptionId,
+      [QuestionNames.TeamsAppType]: "custom-copilot-basic",
+      [QuestionNames.LLMService]: "llm-service-azure-openai",
+      [QuestionNames.AzureOpenAIKey]: "test",
       [QuestionNames.ProgrammingLanguage]: "javascript",
       [QuestionNames.Folder]: os.tmpdir(),
       [QuestionNames.AppName]: randomAppName(),

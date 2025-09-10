@@ -549,4 +549,8 @@ describe("getTeamsProjectTypeByCapability", () => {
     const type = getTeamsProjectTypeByCapability(MeCapabilityOptions.m365SearchMe().id);
     assert.equal(type, TeamsProjectTypeOptions.meOptionId);
   });
+  it("Teams Agent", () => {
+    const type = getTeamsProjectTypeByCapability(CustomCopilotCapabilityOptions.basicChatbot().id);
+    assert.equal(type, CustomCopilotCapabilityOptions.basicChatbot().id);
+  });
 });
