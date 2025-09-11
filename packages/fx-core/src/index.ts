@@ -117,13 +117,13 @@ export * from "./question/options";
 export { VSCapabilityOptions } from "./question/scaffold/vs/createRootNode";
 export {
   BotCapabilityOptions,
-  TeamsAgentCapabilityOptions as CustomCopilotCapabilityOptions,
   CustomEngineAgentOptions,
   DACapabilityOptions,
   MeCapabilityOptions,
   OfficeAddinCapabilityOptions,
   TabCapabilityOptions,
   TdpCapabilityOptions,
+  TeamsAgentCapabilityOptions,
 } from "./question/scaffold/vsc/CapabilityOptions";
 export { isTdpTemplate } from "./question/scaffold/vsc/createFromTdpNode";
 export {

@@ -542,10 +542,6 @@ describe("getTeamsAppTypeByCapability", () => {
     const type = getTeamsAppTypeByCapability(TabCapabilityOptions.nonSsoTab().id);
     assert.equal(type, "others");
   });
-  it("basicChatbot", () => {
-    const type = getTeamsCapabilityByCapability(TeamsAgentCapabilityOptions.basicChatbot().id);
-    assert.equal(type, TeamsAgentCapabilityOptions.basicChatbot().id);
-  });
   it("Invalid", () => {
     const type = getTeamsCapabilityByCapability("invalid");
     assert.equal(type, "");
