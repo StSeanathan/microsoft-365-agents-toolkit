@@ -514,7 +514,7 @@ export class Notification {
 export class CreateProjectQuestion {
   static readonly CustomCopilot = "Custom Engine Agent";
   static readonly TeamsApp = "Teams App";
-  static readonly AgentForTeams = "Agent for Teams";
+  static readonly AgentForTeams = "Teams Agents and Apps";
   static readonly Bot = "Bot";
   static readonly Tab = "Tab";
   static readonly MessageExtension = "Message Extension";
@@ -532,8 +532,9 @@ export class CreateProjectQuestion {
   static readonly AgentWithApi = "Agent with API";
   static readonly DeclarativeAgent = "Declarative Agent";
   static readonly BasicCustomEngineAgent = "Basic Custom Engine Agent";
-  static readonly BasicAgentForTeams = "Basic Agent for Teams";
+  static readonly BasicAgentForTeams = "General Teams Agent";
   static readonly WeatherAgent = "Weather Agent";
+  static readonly TeamsAgentWithData = "Teams Agent with Data";
 }
 
 export class ValidationContent {
