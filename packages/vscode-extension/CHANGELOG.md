@@ -11,7 +11,7 @@ Below you’ll find a comprehensive list of new featuree and enhancements includ
 
 ### New Features
 
-**Declarative agents: expand scope support**
+- **Declarative agents: expand scope support**
 
 In previous versions, declarative agents were uploaded to Copilot with the default `Personal` scope. With this release, developers can now upload their declarative agents using a `Shared` scope, enabling broader distribution on the Copilot platform.
 
@@ -21,7 +21,7 @@ This behavior is controlled through the `AGENT_SCOPE` parameter defined in the e
 
 > If you are using ATK CLI, specify the install scope by: `atk install --file-path [Your zip package path] -scope [Shared/Personal] ` or run `atk install -h` to get help.
 
-**Declarative agents: sharing made easy**
+- **Declarative agents: sharing made easy**
 
 Users can now share their declarative agents more flexibly — either with all tenant users or with a specific group of users by listing their email addresses. This can be done directly through the ATK UI or via the ATK CLI.
 
@@ -30,7 +30,7 @@ To make this simpler, a new “Share” button has been added to the lifecycle m
 
 > If you are using ATK CLI, share the agent by:`atk share -scope [tenant/users]` or run `atk share -h` to get help.
 
-**Comprehensive upgrade Teams Agents and apps templates**
+- **Comprehensive upgrade Teams Agents and apps templates**
 
 We’re thrilled to announce that in this release, all Teams agents and Teams app project templates have been upgraded to use the next generation and modern Teams SDK — the Teams AI Library V2!
 
