@@ -28,14 +28,13 @@ import { QuestionNames } from "../../questionNames";
 import {
   ApiAuthOptions,
   BotCapabilityOptions,
-  CustomCopilotAssistantOptions,
-  CustomCopilotCapabilityOptions,
   CustomCopilotRagOptions,
   MeArchitectureOptions,
   MeCapabilityOptions,
   NotificationBotOptions,
   setTemplateName,
   TabCapabilityOptions,
+  TeamsAgentCapabilityOptions,
 } from "./CapabilityOptions";
 import { ProjectTypeOptions } from "./ProjectTypeOptions";
 
@@ -48,12 +47,9 @@ export function teamsProjectNode(platform: Platform): IQTreeNode {
       title: getLocalizedString("core.createProjectQuestion.projectType.teamsAgentsAndApps.title"),
       type: "singleSelect",
       staticOptions: [
-        CustomCopilotCapabilityOptions.basicChatbot(),
-        CustomCopilotCapabilityOptions.customCopilotRag(),
-        CustomCopilotCapabilityOptions.aiAgent(),
-        TeamsProjectTypeOptions.bot(platform),
-        TeamsProjectTypeOptions.tab(platform),
-        TeamsProjectTypeOptions.me(platform),
+        TeamsAgentCapabilityOptions.basicChatbot(),
+        TeamsAgentCapabilityOptions.customCopilotRag(),
+        TeamsAgentCapabilityOptions.others(),
       ],
       placeholder: getLocalizedString(
         "core.createProjectQuestion.projectType.customCopilot.placeholder"
@@ -62,18 +58,37 @@ export function teamsProjectNode(platform: Platform): IQTreeNode {
     },
     children: [
       customCopilotRagNode(),
-      aiAgentNode(),
+      // aiAgentNode(),
       llmServiceNode({
         enum: [
-          CustomCopilotCapabilityOptions.basicChatbot().id,
-          CustomCopilotCapabilityOptions.customCopilotRag().id,
-          CustomCopilotCapabilityOptions.aiAgent().id,
+          TeamsAgentCapabilityOptions.basicChatbot().id,
+          TeamsAgentCapabilityOptions.customCopilotRag().id,
         ],
       }),
-      botProjectTypeNode(),
-      tabProjectTypeNode(),
-      meProjectTypeNode(),
+      teamsCapabilityNode(platform),
     ],
+  };
+}
+
+function teamsCapabilityNode(platform: Platform): IQTreeNode {
+  return {
+    // teams-app-type = Others
+    condition: { equals: TeamsAgentCapabilityOptions.others().id },
+    data: {
+      name: QuestionNames.TeamsCapability,
+      title: getLocalizedString("core.createProjectQuestion.teamsCapability.title"),
+      type: "singleSelect",
+      staticOptions: [
+        TabCapabilityOptions.nonSsoTab(),
+        MeCapabilityOptions.basicMe(),
+        BotCapabilityOptions.basicBot(),
+      ],
+      placeholder: getLocalizedString(
+        "core.createProjectQuestion.projectType.customCopilot.placeholder"
+      ),
+      onDidSelection: setTemplateName,
+    },
+    children: [],
   };
 }
 
@@ -117,11 +132,13 @@ export class TeamsProjectTypeOptions {
 
 export function customCopilotRagNode(): IQTreeNode {
   return {
-    condition: { equals: CustomCopilotCapabilityOptions.customCopilotRag().id },
+    condition: { equals: TeamsAgentCapabilityOptions.customCopilotRag().id },
     data: {
       type: "singleSelect",
       name: QuestionNames.CustomCopilotRag,
-      title: getLocalizedString("core.createProjectQuestion.capability.customCopilotRag.title"),
+      title: getLocalizedString(
+        "core.createProjectQuestion.capability.customCopilotRagOption.label"
+      ),
       placeholder: getLocalizedString(
         "core.createProjectQuestion.capability.customCopilotRag.placeholder"
       ),
@@ -129,7 +146,7 @@ export function customCopilotRagNode(): IQTreeNode {
         CustomCopilotRagOptions.customize(),
         CustomCopilotRagOptions.azureAISearch(),
         CustomCopilotRagOptions.customApi(),
-        CustomCopilotRagOptions.microsoft365(),
+        // CustomCopilotRagOptions.microsoft365(),
       ],
       default: CustomCopilotRagOptions.customize().id,
       onDidSelection: setTemplateName,
@@ -138,27 +155,27 @@ export function customCopilotRagNode(): IQTreeNode {
   };
 }
 
-export function aiAgentNode(): IQTreeNode {
-  return {
-    condition: { equals: CustomCopilotCapabilityOptions.aiAgent().id },
-    data: {
-      type: "singleSelect",
-      name: QuestionNames.CustomCopilotAssistant,
-      title: getLocalizedString(
-        "core.createProjectQuestion.capability.customCopilotAssistant.title"
-      ),
-      placeholder: getLocalizedString(
-        "core.createProjectQuestion.capability.customCopilotAssistant.placeholder"
-      ),
-      staticOptions: [
-        CustomCopilotAssistantOptions.new(),
-        CustomCopilotAssistantOptions.assistantsApi(),
-      ],
-      default: CustomCopilotAssistantOptions.new().id,
-      onDidSelection: setTemplateName,
-    },
-  };
-}
+// export function aiAgentNode(): IQTreeNode {
+//   return {
+//     condition: { equals: CustomCopilotCapabilityOptions.aiAgent().id },
+//     data: {
+//       type: "singleSelect",
+//       name: QuestionNames.CustomCopilotAssistant,
+//       title: getLocalizedString(
+//         "core.createProjectQuestion.capability.customCopilotAssistant.title"
+//       ),
+//       placeholder: getLocalizedString(
+//         "core.createProjectQuestion.capability.customCopilotAssistant.placeholder"
+//       ),
+//       staticOptions: [
+//         CustomCopilotAssistantOptions.new(),
+//         CustomCopilotAssistantOptions.assistantsApi(),
+//       ],
+//       default: CustomCopilotAssistantOptions.new().id,
+//       onDidSelection: setTemplateName,
+//     },
+//   };
+// }
 
 export function llmServiceNode(
   condition?: StringValidation | StringArrayValidation | ConditionFunc
@@ -202,7 +219,7 @@ export function llmServiceNode(
         children: [
           {
             condition: (inputs: Inputs) => {
-              return inputs[QuestionNames.AzureOpenAIKey].length > 0;
+              return inputs[QuestionNames.AzureOpenAIKey]?.length > 0;
             },
             data: {
               type: "text",
@@ -217,7 +234,7 @@ export function llmServiceNode(
             children: [
               {
                 condition: (inputs: Inputs) => {
-                  return inputs[QuestionNames.AzureOpenAIEndpoint].length > 0;
+                  return inputs[QuestionNames.AzureOpenAIEndpoint]?.length > 0;
                 },
                 data: {
                   type: "text",

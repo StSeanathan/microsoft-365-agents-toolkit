@@ -8,15 +8,13 @@ import { appNameQuestion, folderQuestion } from "../../create";
 import { QuestionNames } from "../../questionNames";
 import {
   BotCapabilityOptions,
-  CustomCopilotCapabilityOptions,
   MeCapabilityOptions,
   setTemplateName,
-  TdpCapabilityOptions,
+  TeamsAgentCapabilityOptions,
 } from "../vsc/CapabilityOptions";
 import { folderAndAppNameCondition, languageNode } from "../vsc/createRootNode";
 import { daProjectTypeNode } from "../vsc/daProjectTypeNode";
 import {
-  aiAgentNode,
   customCopilotRagNode,
   llmServiceNode,
   m365SearchMeSubNode,
@@ -98,9 +96,9 @@ export function scaffoldQuestionForVS(): IQTreeNode {
           staticOptions: [
             VSCapabilityOptions.empty(),
             VSCapabilityOptions.declarativeAgent(),
-            CustomCopilotCapabilityOptions.basicChatbot(),
-            CustomCopilotCapabilityOptions.customCopilotRag(),
-            CustomCopilotCapabilityOptions.aiAgent(),
+            TeamsAgentCapabilityOptions.basicChatbot(),
+            TeamsAgentCapabilityOptions.customCopilotRag(),
+            // TeamsAgentCapabilityOptions.aiAgent(),
             VSCapabilityOptions.weatherAgentBot(),
             BotCapabilityOptions.basicBot(),
             BotCapabilityOptions.notificationBot(),
@@ -112,20 +110,19 @@ export function scaffoldQuestionForVS(): IQTreeNode {
             MeCapabilityOptions.collectFormMe(),
             VSCapabilityOptions.SearchMeVS(),
             MeCapabilityOptions.linkUnfurling(),
-            TdpCapabilityOptions.me(),
           ],
           onDidSelection: setTemplateName,
         },
         children: [
           daProjectTypeNode(VSCapabilityOptions.declarativeAgent().id),
           customCopilotRagNode(),
-          aiAgentNode(),
+          // aiAgentNode(),
           m365SearchMeSubNode(),
           llmServiceNode({
             enum: [
-              CustomCopilotCapabilityOptions.basicChatbot().id,
-              CustomCopilotCapabilityOptions.customCopilotRag().id,
-              CustomCopilotCapabilityOptions.aiAgent().id,
+              TeamsAgentCapabilityOptions.basicChatbot().id,
+              TeamsAgentCapabilityOptions.customCopilotRag().id,
+              // TeamsAgentCapabilityOptions.aiAgent().id,
               VSCapabilityOptions.weatherAgentBot().id,
             ],
           }),
