@@ -48,6 +48,9 @@ With these updates, developers can now spin up fully functional Teams agents fas
 
 Let’s build smarter, more interactive Teams apps together! 💡
 
+- **TeamsFx SDK Deprecation Notice**
+We’re beginning the deprecation process for the TeamsFx SDK. Its core functionalities are now covered by the modern M365 Agents SDK and Teams AI library. While TeamsFx SDK will continue to be maintained, no new features will be added. Full deprecation is planned for July 2026.
+
 ### Enhancement 
 
 - Updated the [app manifest version to v1.23](https://developer.microsoft.com/json-schemas/teams/v1.23/MicrosoftTeams.schema.json).
