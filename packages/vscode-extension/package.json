@@ -1969,7 +1969,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "fs-extra": "^9.0.1",
     "lint-staged": "^11.2.6",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mermaid": "^10.9.0",
     "mocha": "^10.0.0",
     "mocha-multi-reporters": "^1.5.1",
@@ -2015,7 +2015,7 @@
     "@vscode/extension-telemetry": "^0.6.2",
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "async-mutex": "^0.3.1",
-    "axios": "^1.8.3",
+    "axios": "^1.13.5",
     "chrome-remote-interface": "^0.33.2",
     "detect-port": "^1.3.0",
     "devtools-protocol": "^0.0.1387316",
@@ -2039,7 +2039,7 @@
     "string-similarity": "^4.0.4",
     "tmp": "^0.2.1",
     "tree-kill": "^1.2.2",
-    "validator": "^13.7.0",
+    "validator": "^13.15.22",
     "vscode-tas-client": "^0.1.75"
   },
   "extensionDependencies": [
